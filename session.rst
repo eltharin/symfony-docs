@@ -115,7 +115,7 @@ sessions for anonymous users, you must *completely* avoid accessing the session.
 .. note::
 
     Sessions will also be started when using features that rely on them internally,
-    such as the :ref:`CSRF protection in forms <csrf-protection-forms>`.
+    such as the :ref:`stateful CSRF protection in forms <csrf-protection-forms>`.
 
 .. _flash-messages:
 
@@ -1852,8 +1852,8 @@ the example below:
                 https://symfony.com/schema/dic/services/services-1.0.xsd">
 
             <framework:config>
-                <framework:session storage-id="session.storage.php_bridge"
-                    handler-id="session.storage.native_file"
+                <framework:session storage-id="session.storage.factory.php_bridge"
+                    handler-id="session.handler.native_file"
                 />
             </framework:config>
         </container>
@@ -1866,7 +1866,7 @@ the example below:
         return static function (FrameworkConfig $framework): void {
             $framework->session()
                 ->storageFactoryId('session.storage.factory.php_bridge')
-                ->handlerId('session.storage.native_file')
+                ->handlerId('session.handler.native_file')
             ;
         };
 

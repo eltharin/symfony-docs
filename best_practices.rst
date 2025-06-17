@@ -95,7 +95,7 @@ Use Secrets for Sensitive Information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When your application has sensitive configuration, like an API key, you should
-store those securely via :doc:`Symfony’s secrets management system </configuration/secrets>`.
+store those securely via :doc:`Symfony's secrets management system </configuration/secrets>`.
 
 Use Parameters for Application Configuration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -361,10 +361,6 @@ Define a Single Firewall
 Unless you have two legitimately different authentication systems and users
 (e.g. form login for the main site and a token system for your API only), it's
 recommended to have only one firewall to keep things simple.
-
-Additionally, you should use the ``anonymous`` key under your firewall. If you
-require users to be logged in for different sections of your site, use the
-:doc:`access_control </security/access_control>` option.
 
 Use the ``auto`` Password Hasher
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -805,8 +805,6 @@ csrf_protection
 
     For more information about CSRF protection, see :doc:`/security/csrf`.
 
-.. _reference-csrf_protection-enabled:
-
 enabled
 .......
 
@@ -853,6 +851,44 @@ can also :ref:`disable CSRF protection on individual forms <form-csrf-customizat
 If you're using forms, but want to avoid starting your session (e.g. using
 forms in an API-only website), ``csrf_protection`` will need to be set to
 ``false``.
+
+stateless_token_ids
+...................
+
+**type**: ``array`` **default**: ``[]``
+
+The list of CSRF token ids that will use :ref:`stateless CSRF protection <csrf-stateless-tokens>`.
+
+.. versionadded:: 7.2
+
+    The ``stateless_token_ids`` option was introduced in Symfony 7.2.
+
+check_header
+............
+
+**type**: ``integer`` or ``bool`` **default**: ``false``
+
+Whether to check the CSRF token in an HTTP header in addition to the cookie when
+using :ref:`stateless CSRF protection <csrf-stateless-tokens>`. You can also set
+this to ``2`` (the value of the ``CHECK_ONLY_HEADER`` constant on the
+:class:`Symfony\\Component\\Security\\Csrf\\SameOriginCsrfTokenManager` class)
+to check only the header and ignore the cookie.
+
+.. versionadded:: 7.2
+
+    The ``check_header`` option was introduced in Symfony 7.2.
+
+cookie_name
+...........
+
+**type**: ``string`` **default**: ``csrf-token``
+
+The name of the cookie (and HTTP header) to use for the double-submit when using
+:ref:`stateless CSRF protection <csrf-stateless-tokens>`.
+
+.. versionadded:: 7.2
+
+    The ``cookie_name`` option was introduced in Symfony 7.2.
 
 .. _config-framework-default_locale:
 
@@ -1164,14 +1200,31 @@ settings is configured.
 
     For more details, see :doc:`/forms`.
 
-.. _reference-form-field-name:
+csrf_protection
+...............
 
 field_name
-..........
+''''''''''
 
 **type**: ``string`` **default**: ``_token``
 
 This is the field name that you should give to the CSRF token field of your forms.
+
+field_attr
+''''''''''
+
+**type**: ``array`` **default**: ``['data-controller' => 'csrf-protection']``
+
+HTML attributes to add to the CSRF token field of your forms.
+
+token_id
+''''''''
+
+**type**: ``string`` **default**: ``null``
+
+The CSRF token ID used to validate the CSRF tokens of your forms. This setting
+applies only to form types that use :ref:`service autoconfiguration <services-autoconfigure>`,
+which typically means your own form types, not those registered by third-party bundles.
 
 fragments
 ~~~~~~~~~
@@ -1239,20 +1292,20 @@ http_cache
 allow_reload
 ............
 
-**type**: ``string``
+**type**: ``boolean`` **default**: ``false``
 
 Specifies whether the client can force a cache reload by including a
 Cache-Control "no-cache" directive in the request. Set it to ``true``
-for compliance with RFC 2616. (default: false)
+for compliance with RFC 2616.
 
 allow_revalidate
 ................
 
-**type**: ``string``
+**type**: ``boolean`` **default**: ``false``
 
 Specifies whether the client can force a cache revalidate by including a
 Cache-Control "max-age=0" directive in the request. Set it to ``true``
-for compliance with RFC 2616. (default: false)
+for compliance with RFC 2616.
 
 debug
 .....
@@ -1265,11 +1318,11 @@ try to carry on and deliver a meaningful response.
 default_ttl
 ...........
 
-**type**: ``integer``
+**type**: ``integer`` **default**: ``0``
 
 The number of seconds that a cache entry should be considered fresh when no
 explicit freshness information is provided in a response. Explicit
-Cache-Control or Expires headers override this value. (default: 0)
+Cache-Control or Expires headers override this value.
 
 enabled
 .......
@@ -1279,11 +1332,11 @@ enabled
 private_headers
 ...............
 
-**type**: ``array``
+**type**: ``array`` **default**: ``['Authorization', 'Cookie']``
 
 Set of request headers that trigger "private" cache-control behavior on responses
 that don't explicitly state whether the response is public or private via a
-Cache-Control directive. (default: Authorization and Cookie)
+Cache-Control directive.
 
 skip_response_headers
 .....................
@@ -1296,30 +1349,30 @@ and public.
 stale_if_error
 ..............
 
-**type**: ``integer``
+**type**: ``integer`` **default**: ``60``
 
 Specifies the default number of seconds (the granularity is the second) during
-which the cache can serve a stale response when an error is encountered
-(default: 60). This setting is overridden by the stale-if-error HTTP
+which the cache can serve a stale response when an error is encountered.
+This setting is overridden by the stale-if-error HTTP
 Cache-Control extension (see RFC 5861).
 
 stale_while_revalidate
 ......................
 
-**type**: ``integer``
+**type**: ``integer`` **default**: ``2``
 
 Specifies the default number of seconds (the granularity is the second as the
 Response TTL precision is a second) during which the cache can immediately return
-a stale response while it revalidates it in the background (default: 2).
+a stale response while it revalidates it in the background.
 This setting is overridden by the stale-while-revalidate HTTP Cache-Control
 extension (see RFC 5861).
 
 trace_header
 ............
 
-**type**: ``string``
+**type**: ``string`` **default**: ``'X-Symfony-Cache'``
 
-Header name to use for traces. (default: X-Symfony-Cache)
+Header name to use for traces.
 
 trace_level
 ...........
@@ -1328,7 +1381,7 @@ trace_level
 
 For 'short', a concise trace of the main request will be added as an HTTP header.
 'full' will add traces for all requests (including ESI subrequests).
-(default: 'full' if in debug; 'none' otherwise)
+(default: ``'full'`` if in debug; ``'none'`` otherwise)
 
 .. _reference-http-client:
 
@@ -1920,6 +1973,8 @@ named ``kernel.http_method_override``.
         $request = Request::createFromGlobals();
         // ...
 
+.. _reference-framework-ide:
+
 ide
 ~~~
 
@@ -2232,7 +2287,7 @@ php_errors
 log
 ...
 
-**type**: ``boolean`` | ``int`` | ``array<int, string>`` **default**: ``true``
+**type**: ``boolean``, ``int`` or ``array<int, string>`` **default**: ``true``
 
 Use the application logger instead of the PHP logger for logging PHP errors.
 When an integer value is used, it defines a bitmask of PHP errors that will
@@ -2756,8 +2811,8 @@ the name as key and DSN or service id as value:
     .. code-block:: php
 
         // config/packages/semaphore.php
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
         use Symfony\Config\FrameworkConfig;
+        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
         return static function (FrameworkConfig $framework): void {
             $framework->semaphore()
@@ -3122,8 +3177,8 @@ and also to configure the session handler with a DSN:
     .. code-block:: php
 
         // config/packages/framework.php
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
         use Symfony\Config\FrameworkConfig;
+        use function Symfony\Component\DependencyInjection\Loader\Configurator\env;
 
         return static function (FrameworkConfig $framework): void {
             // ...

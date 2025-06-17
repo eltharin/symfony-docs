@@ -497,8 +497,8 @@ in container parameters <service-container-parameters>`:
     .. code-block:: php
 
         // config/packages/twig.php
-        use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
         use Symfony\Config\TwigConfig;
+        use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
         return static function (TwigConfig $twig): void {
             // ...
@@ -870,6 +870,7 @@ errors. It's useful to run it before deploying your application to production
     $ php bin/console lint:twig templates/article/recent_list.html.twig
 
     # you can also show the deprecated features used in your templates
+    # (only the first deprecation is shown, so run multiple times to catch all)
     $ php bin/console lint:twig --show-deprecations templates/email/
 
     # you can also excludes directories

@@ -149,7 +149,7 @@ Defining Event Listeners with PHP Attributes
 
 An alternative way to define an event listener is to use the
 :class:`Symfony\\Component\\EventDispatcher\\Attribute\\AsEventListener`
-PHP attribute. This allows to configure the listener inside its class, without
+PHP attribute. This allows you to configure the listener inside its class, without
 having to add any configuration in external files::
 
     namespace App\EventListener;
@@ -246,14 +246,14 @@ methods could be called before or after the methods defined in other listeners
 and subscribers. To learn more about event subscribers, read :doc:`/components/event_dispatcher`.
 
 The following example shows an event subscriber that defines several methods which
-listen to the same ``kernel.exception`` event::
+listen to the same :ref:`kernel.exception event <component-http-kernel-kernel-exception>`
+via its ``ExceptionEvent`` class::
 
     // src/EventSubscriber/ExceptionSubscriber.php
     namespace App\EventSubscriber;
 
     use Symfony\Component\EventDispatcher\EventSubscriberInterface;
     use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-    use Symfony\Component\HttpKernel\KernelEvents;
 
     class ExceptionSubscriber implements EventSubscriberInterface
     {
@@ -261,7 +261,7 @@ listen to the same ``kernel.exception`` event::
         {
             // return the subscribed events, their methods and priorities
             return [
-                KernelEvents::EXCEPTION => [
+                ExceptionEvent::class => [
                     ['processException', 10],
                     ['logException', 0],
                     ['notifyException', -10],

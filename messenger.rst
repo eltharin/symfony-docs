@@ -1239,8 +1239,8 @@ to retry them:
     # see the 10 first messages
     $ php bin/console messenger:failed:show --max=10
 
-    # see only MyClass messages
-    $ php bin/console messenger:failed:show --class-filter='MyClass'
+    # see only App\Message\MyMessage messages
+    $ php bin/console messenger:failed:show --class-filter='App\Message\MyMessage'
 
     # see the number of messages by message class
     $ php bin/console messenger:failed:show --stats
@@ -1447,7 +1447,7 @@ RabbitMQ. Install it by running:
 
     $ composer require symfony/amqp-messenger
 
-The AMQP transport DSN may looks like this:
+The AMQP transport DSN may look like this:
 
 .. code-block:: env
 
@@ -1776,7 +1776,20 @@ under the transport in ``messenger.yaml``:
     The Redis consumer group name
 
 ``consumer`` (default: ``consumer``)
-    Consumer name used in Redis
+    Consumer name used in Redis. Allows setting an explicit consumer name identifier.
+    Recommended in environments with multiple workers to prevent duplicate message
+    processing. Typically set via an environment variable:
+
+    .. code-block:: yaml
+
+        # config/packages/messenger.yaml
+        framework:
+            messenger:
+                transports:
+                    redis:
+                        dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                        options:
+                            consumer: '%env(MESSENGER_CONSUMER_NAME)%'
 
 ``auto_setup`` (default: ``true``)
     Whether to create the Redis group automatically
@@ -2455,7 +2468,8 @@ Possible options to configure with tags are:
     Name of the method that will process the message.
 
 ``priority``
-    Priority of the handler when multiple handlers can process the same message.
+    Defines the order in which the handler is executed when multiple handlers
+    can process the same message; those with higher priority run first.
 
 .. _handler-subscriber-options:
 
@@ -2581,7 +2595,7 @@ using the ``DispatchAfterCurrentBusMiddleware`` and adding a
     {
         public function __construct(
             private MailerInterface $mailer,
-            EntityManagerInterface $em,
+            private EntityManagerInterface $em,
         ) {
         }
 

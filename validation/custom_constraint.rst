@@ -176,6 +176,12 @@ message as its argument and returns an instance of
 :class:`Symfony\\Component\\Validator\\Violation\\ConstraintViolationBuilderInterface`.
 The ``addViolation()`` method call finally adds the violation to the context.
 
+.. tip::
+
+    Validation error messages are automatically translated to the current application
+    locale. If your application doesn't use translations, you can disable this behavior
+    by calling the ``disableTranslation()`` method of ``ConstraintViolationBuilderInterface``.
+
 Using the new Validator
 -----------------------
 
@@ -314,7 +320,7 @@ define those options as public properties on the constraint class::
     }
 
 Then, inside the validator class you can access these options directly via the
-constraint class passes to the ``validate()`` method::
+constraint class passed to the ``validate()`` method::
 
     class FooValidator extends ConstraintValidator
     {

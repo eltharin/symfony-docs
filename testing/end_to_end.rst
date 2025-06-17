@@ -26,7 +26,7 @@ to install the needed dependencies:
 
 .. code-block:: terminal
 
-    $ composer require symfony/panther
+    $ composer require --dev symfony/panther
 
 .. include:: /components/require_autoload.rst.inc
 
@@ -878,7 +878,7 @@ Then declare it as a router for Panther server in ``phpunit.xml.dist`` using the
         <!-- ... -->
         <php>
             <!-- ... -->
-            <server name="PANTHER_WEB_SERVER_ROUTER" value="./tests/router.php"/>
+            <server name="PANTHER_WEB_SERVER_ROUTER" value="../tests/router.php"/>
         </php>
     </phpunit>
 

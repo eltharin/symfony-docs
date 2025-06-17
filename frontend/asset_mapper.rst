@@ -243,6 +243,26 @@ This adds the ``bootstrap`` package to your ``importmap.php`` file::
     `package.json configuration file`_. Try to contact the package maintainer to
     ask them to fix those issues.
 
+.. tip::
+
+    If you see a network error like *Connection was reset for "https://cdn.jsdelivr.net/npm/..."*,
+    it may be caused by a proxy or firewall restriction. In that case, you can
+    temporarily configure a proxy to connect to the ``jsDelivr`` CDN:
+
+    .. code-block:: yaml
+
+        # config/packages/framework.yaml
+        framework:
+            # ...
+            http_client:
+                default_options:
+                    proxy: '185.250.180.238:8080'
+                    # if you use CURL, add extra options:
+                    extra:
+                        curl:
+                            # 61 is value of constant CURLOPT_HTTPPROXYTUNNEL
+                            '61': true
+
 Now you can import the ``bootstrap`` package like usual:
 
 .. code-block:: javascript
@@ -1065,14 +1085,19 @@ both ``app`` and ``checkout``:
         {{ importmap(['app', 'checkout']) }}
     {% endblock %}
 
-By passing both ``app`` and ``checkout``, the ``importmap()`` function will
-output the ``importmap`` and also add a ``<script type="module">`` tag that
-loads the ``app.js`` file *and* the ``checkout.js`` file. It's important
-to *not* call ``parent()`` in the ``importmap`` block. Each page can only
-have *one* importmap, so ``importmap()`` must be called exactly once.
+The ``importmap()`` function always includes the full import map to ensure all
+module definitions are available on the page. It also adds a ``<script type="module">``
+tag to load the specific JavaScript entry files you pass to it (in the example
+above, the ``app.js`` file *and* the ``checkout.js`` file).
 
-If, for some reason, you want to execute *only* ``checkout.js``
-and *not* ``app.js``, pass only ``checkout`` to ``importmap()``.
+.. warning::
+
+    Do not call ``parent()`` inside the ``{% block importmap %}`` Twig block. Each
+    page can include only one import map, so ``importmap()`` must be called exactly once.
+
+If you want to execute *only* ``checkout.js`` (and not ``app.js``), call
+``{{ importmap('checkout') }}``. In this case, the full import map will still be
+included in the page, but only the ``checkout.js`` file will actually be loaded.
 
 Using a Content Security Policy (CSP)
 -------------------------------------

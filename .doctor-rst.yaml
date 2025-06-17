@@ -8,6 +8,7 @@ rules:
     correct_code_block_directive_based_on_the_content: ~
     deprecated_directive_should_have_version: ~
     ensure_bash_prompt_before_composer_command: ~
+    ensure_class_constant: ~
     ensure_correct_format_for_phpfunction: ~
     ensure_exactly_one_space_before_directive_type: ~
     ensure_exactly_one_space_between_link_definition_and_link: ~
@@ -49,6 +50,7 @@ rules:
     no_namespace_after_use_statements: ~
     no_php_open_tag_in_code_block_php_directive: ~
     no_space_before_self_xml_closing_tag: ~
+    no_typographic_quotes: ~
     non_static_phpunit_assertions: ~
     only_backslashes_in_namespace_in_php_code_block: ~
     only_backslashes_in_use_statements_in_php_code_block: ~
@@ -72,7 +74,6 @@ rules:
     versionadded_directive_should_have_version: ~
     yaml_instead_of_yml_suffix: ~
 
-    #   master
     versionadded_directive_major_version:
         major_version: 7
 

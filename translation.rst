@@ -502,7 +502,9 @@ Symfony looks for message files (i.e. translations) in the following default loc
   ``Resources/translations/`` directory, which is no longer recommended for bundles).
 
 The locations are listed here with the highest priority first. That is, you can
-override the translation messages of a bundle in the first directory.
+override the translation messages of a bundle in the first directory. Bundles are
+processed in the order in which they are listed in the ``config/bundles.php`` file,
+so bundles appearing earlier have higher priority.
 
 The override mechanism works at a key level: only the overridden keys need
 to be listed in a higher priority message file. When a key is not found
@@ -597,8 +599,7 @@ Translations of Doctrine Entities
 
 Unlike the contents of templates, it's not practical to translate the contents
 stored in Doctrine Entities using translation catalogs. Instead, use the
-Doctrine `Translatable Extension`_ or the `Translatable Behavior`_. For more
-information, read the documentation of those libraries.
+Doctrine `Translatable Extension`_.
 
 Custom Translation Resources
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1097,18 +1098,11 @@ checks translation resources for several locales:
 Switch Locale Programmatically
 ------------------------------
 
-Sometimes you need to change the locale of the application dynamically
-just to run some code. Imagine a console command that renders Twig templates
-of emails in different languages. You need to change the locale only to
-render those templates.
+Sometimes you need to change the application's locale dynamically while running
+some code. For example, a console command that renders email templates in
+different languages. In such cases, you only need to switch the locale temporarily.
 
-The ``LocaleSwitcher`` class allows you to change at once the locale
-of:
-
-* All the services that are tagged with ``kernel.locale_aware``;
-* ``\Locale::setDefault()``;
-* If the ``RequestContext`` service is available, the ``_locale``
-  parameter (so urls are generated with the new locale)::
+The ``LocaleSwitcher`` class allows you to do that::
 
     use Symfony\Component\Translation\LocaleSwitcher;
 
@@ -1121,28 +1115,23 @@ of:
 
         public function someMethod(): void
         {
-            // you can get the current application locale like this:
             $currentLocale = $this->localeSwitcher->getLocale();
 
-            // you can set the locale for the entire application like this:
-            // (from now on, the application will use 'fr' (French) as the
-            // locale; including the default locale used to translate Twig templates)
+            // set the application locale programmatically to 'fr' (French):
+            // this affects translation, URL generation, etc.
             $this->localeSwitcher->setLocale('fr');
 
-            // reset the current locale of your application to the configured default locale
-            // in config/packages/translation.yaml, by option 'default_locale'
+            // reset the locale to the default one configured via the
+            // 'default_locale' option in config/packages/translation.yaml
             $this->localeSwitcher->reset();
 
-            // you can also run some code with a certain locale, without
+            // run some code with a specific locale, temporarily, without
             // changing the locale for the rest of the application
             $this->localeSwitcher->runWithLocale('es', function() {
-
-                // e.g. render here some Twig templates using 'es' (Spanish) locale
-
+                // e.g. render templates, send emails, etc. using the 'es' (Spanish) locale
             });
 
-            // you can optionally declare an argument in your callback to receive the
-            // injected locale
+            // optionally, receive the current locale as an argument:
             $this->localeSwitcher->runWithLocale('es', function(string $locale) {
 
                 // here, the $locale argument will be set to 'es'
@@ -1152,6 +1141,20 @@ of:
             // ...
         }
     }
+
+The ``LocaleSwitcher`` class changes the locale of:
+
+* All services tagged with ``kernel.locale_aware``;
+* The default locale set via ``\Locale::setDefault()``;
+* The ``_locale`` parameter of the ``RequestContext`` service (if available),
+  so generated URLs reflect the new locale.
+
+.. note::
+
+    The LocaleSwitcher applies the new locale only for the current request,
+    and its effect is lost on subsequent requests, such as after a redirect.
+
+    See :ref:`how to make the locale persist across requests <locale-sticky-session>`.
 
 When using :ref:`autowiring <services-autowire>`, type-hint any controller or
 service argument with the :class:`Symfony\\Component\\Translation\\LocaleSwitcher`
@@ -1595,7 +1598,6 @@ Learn more
 .. _`ISO 3166-1 alpha-2`: https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes
 .. _`ISO 639-1`: https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 .. _`Translatable Extension`: https://github.com/doctrine-extensions/DoctrineExtensions/blob/main/doc/translatable.md
-.. _`Translatable Behavior`: https://github.com/KnpLabs/DoctrineBehaviors
 .. _`Custom Language Name setting`: https://docs.lokalise.com/en/articles/1400492-uploading-files#custom-language-codes
 .. _`ICU resource bundle`: https://github.com/unicode-org/icu-docs/blob/main/design/bnf_rb.txt
 .. _`Portable object format`: https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
